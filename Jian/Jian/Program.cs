@@ -16,6 +16,15 @@ namespace Jian
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
+
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionTrapper;
+        }
+
+        static void UnhandledExceptionTrapper(object sender, UnhandledExceptionEventArgs e)
+        {
+            WebDriverWrapper.Close();
+
+            Environment.Exit(1);
         }
     }
 }

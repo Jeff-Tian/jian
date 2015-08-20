@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 
 namespace Jian
 {
@@ -40,7 +36,7 @@ namespace Jian
 
             _jianEnt.Pages[0].Interests.Add("促销价", new PatternValuePair()
             {
-                Pattern = "test",
+                Pattern = @"//div[@class='tm-promo-price']/span[@class='tm-price']",
                 Value = "test"
             });
 
@@ -65,6 +61,39 @@ namespace Jian
 
             dg.DataSource = _jianEnt.Pages;
             dg.Refresh();
+        }
+
+        private void 分析AToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (var page in _jianEnt.Pages)
+            {
+                var url = page.Url;
+
+                foreach (var interest in page.Interests.Keys)
+                {
+                    var xpath = page.Interests[interest].Pattern;
+
+                    WebDriverWrapper.GetDriver().Navigate().GoToUrl(url);
+
+                    var wait = new WebDriverWait(WebDriverWrapper.GetDriver(), TimeSpan.FromSeconds(120));
+
+                    wait.Until(d => FindElement(d, xpath));
+                    var element = FindElement(WebDriverWrapper.GetDriver(), xpath);
+                    page.Interests[interest].Value = element.Text;
+                }
+            }
+
+            WebDriverWrapper.Close();
+        }
+
+        private static IWebElement FindElement(IWebDriver driver, string xpath)
+        {
+            return driver.FindElement(By.XPath(xpath));
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            WebDriverWrapper.Close();
         }
     }
 }
