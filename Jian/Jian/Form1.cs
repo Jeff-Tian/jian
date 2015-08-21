@@ -87,5 +87,10 @@ namespace Jian
         {
             new FormSettings().ShowDialog(this);
         }
+
+        private void 关于BToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("当前目录：" + Directory.GetCurrentDirectory());
+        }
     }
 }
